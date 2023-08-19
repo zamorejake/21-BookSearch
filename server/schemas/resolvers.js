@@ -47,7 +47,7 @@ const resolvers = {
       
       if (context.user) {
         const user = await User.findById(context.user._id).populate(
-          "savedBooks"
+          { path: "savedBooks" }
         );
         return user;
       }
@@ -57,8 +57,8 @@ const resolvers = {
   User: {
     savedBooks: async (parent) => {
       if (parent.savedBooks && parent.savedBooks.length > 0) {
-        const savedBooks = await Book.find({ _id: { $in: parent.savedBooks } });
-        return savedBooks;
+        const userWithSavedBooks = await User.findById(parent._id).populate('savedBooks');
+        return userWithSavedBooks.savedBooks;
       }
       return [];
     },
