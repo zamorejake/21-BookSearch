@@ -1,27 +1,58 @@
-const { Tech, Matchup } = require('../models');
+const { User, Book } = require("../models");
 
+const { AuthenticationError } = require("apollo-server-express");
 const resolvers = {
   Query: {
-    tech: async () => {
-      return Tech.find({});
-    },
-    matchups: async (parent, { _id }) => {
-      const params = _id ? { _id } : {};
-      return Matchup.find(params);
+    me: async (_, args, context) => {
+      if (context.user) {
+        const user = await User.findById(context.user._id).populate(
+          "savedBooks"
+        );
+        return user;
+      }
+      throw new AuthenticationError("Not logged in");
     },
   },
   Mutation: {
-    createMatchup: async (parent, args) => {
-      const matchup = await Matchup.create(args);
-      return matchup;
+    login: async (_, { email, password }) => {
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        throw new AuthenticationError("No user found with this email address");
+      }
+
+      const validPassword = await bcrypt.compare(password, user.password);
+
+      if (!validPassword) {
+        throw new AuthenticationError("Incorrect password");
+      }
+
+      const token = jwt.sign({ _id: user._id }, "your-secret-key", {
+        expiresIn: "1h",
+      });
+
+      return { token, user };
     },
-    createVote: async (parent, { _id, techNum }) => {
-      const vote = await Matchup.findOneAndUpdate(
-        { _id },
-        { $inc: { [`tech${techNum}_votes`]: 1 } },
-        { new: true }
-      );
-      return vote;
+    removeBook: async (_, { bookId }, context) => {
+      if (context.user) {
+        const updatedUser = await User.findByIdAndUpdate(
+          context.user._id,
+          { $pull: { savedBooks: bookId } },
+          { new: true }
+        ).populate("savedBooks");
+
+        return updatedUser;
+      }
+      throw new AuthenticationError("Not logged in");
+    },
+  },
+  User: {
+    savedBooks: async (parent) => {
+      if (parent.savedBooks && parent.savedBooks.length > 0) {
+        const savedBooks = await Book.find({ _id: { $in: parent.savedBooks } });
+        return savedBooks;
+      }
+      return [];
     },
   },
 };
