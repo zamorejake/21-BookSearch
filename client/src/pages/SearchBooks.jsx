@@ -50,7 +50,6 @@ const SearchBooks = () => {
   };
 
   const handleSaveBook = async (bookId) => {
-    const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
 
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
@@ -60,14 +59,14 @@ const SearchBooks = () => {
 
     try {
       const { data } = await saveBook({
-        variables: { input: bookToSave },
+        variables: { input: { bookId } },
       });
-
+  
       if (!data.saveBook) {
-        throw new Error("something went wrong!");
+        throw new Error("Something went wrong!");
       }
-
-      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+  
+      setSavedBookIds([...savedBookIds, bookId]);
     } catch (err) {
       console.error(err);
     }

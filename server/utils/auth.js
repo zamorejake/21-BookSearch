@@ -1,39 +1,34 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
-// set token secret and expiration date
-const secret = "mysecretsshhhhh";
-const expiration = "2h";
+// Set token secret and expiration date
+const secret = 'mysecretsshhhhh';
+const expiration = '7200000';
 
 module.exports = {
+  // Function for authenticating routes
   authMiddleware: function (req, res, next) {
     let token = req.query.token || req.headers.authorization;
     if (req.headers.authorization) {
-      const tokenArray = token.split(" ");
-      if (tokenArray[0] === "Bearer" && tokenArray[1]) {
-        token = tokenArray[1];
-      } else {
-        return res.status(401).json({ message: "Invalid token format" });
-      }
+      token = token.split(' ').pop().trim();
+      console.log("line 14" + token)
     }
 
     if (!token) {
-      return res.status(401).json({ message: "You have no token!" });
+      return res.status(400).json({ message: 'You have no token!?!' });
     }
 
     try {
       const { data } = jwt.verify(token, secret, { maxAge: expiration });
       req.user = data;
-      next();
-    } catch {
-      console.log("Invalid token");
-      return res.status(401).json({ message: "Invalid token!" });
+      return req.user
+    } catch (error) {
+      console.error('Invalid token', error);
+      return res.status(400).json({ message: 'Invalid token!' });
     }
 
-    next();
   },
   signToken: function ({ username, email, _id }) {
     const payload = { username, email, _id };
-
     return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
   },
 };

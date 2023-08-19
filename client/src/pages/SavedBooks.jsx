@@ -19,6 +19,9 @@ const SavedBooks = () => {
     }
   }, [data]);
 
+  useEffect(() => {
+  }, [userData.savedBooks]);
+
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
@@ -31,12 +34,12 @@ const SavedBooks = () => {
         variables: { bookId },
       });
 
-      setUserData({
-        ...userData,
-        savedBooks: userData.savedBooks.filter(
+      setUserData((prevUserData) => ({
+        ...prevUserData,
+        savedBooks: prevUserData.savedBooks.filter(
           (book) => book.bookId !== bookId
         ),
-      });
+      }));
 
       removeBookId(bookId);
     } catch (err) {

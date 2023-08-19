@@ -1,18 +1,7 @@
 const { User, Book } = require("../models");
-
+const bcrypt = require("bcrypt");
 const { AuthenticationError } = require("apollo-server-express");
 const resolvers = {
-  Query: {
-    me: async (_, args, context) => {
-      if (context.user) {
-        const user = await User.findById(context.user._id).populate(
-          "savedBooks"
-        );
-        return user;
-      }
-      throw new AuthenticationError("Not logged in");
-    },
-  },
   Mutation: {
     login: async (_, { email, password }) => {
       const user = await User.findOne({ email });
@@ -27,11 +16,18 @@ const resolvers = {
         throw new AuthenticationError("Incorrect password");
       }
 
-      const token = jwt.sign({ _id: user._id }, "your-secret-key", {
-        expiresIn: "1h",
-      });
-
-      return { token, user };
+      const token = jwt.sign(
+        {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+        },
+        "mysecretsshhhhh",
+        {
+          expiresIn: "7200000",
+        }
+      );
+      return { token, user: user.toObject() };
     },
     removeBook: async (_, { bookId }, context) => {
       if (context.user) {
@@ -43,7 +39,19 @@ const resolvers = {
 
         return updatedUser;
       }
-      throw new AuthenticationError("Not logged in");
+      throw new AuthenticationError("Not logged in!!!");
+    },
+  },
+  Query: {
+    users: async (_, args, context) => {
+      
+      if (context.user) {
+        const user = await User.findById(context.user._id).populate(
+          "savedBooks"
+        );
+        return user;
+      }
+      throw new AuthenticationError("Not logged in???resolvers");
     },
   },
   User: {
