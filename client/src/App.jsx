@@ -13,7 +13,7 @@ function App() {
   const token = getToken();
 
   const client = new ApolloClient({
-    uri: "http://localhost:3001/graphql",
+    uri: "https://book-engine-mern-21-5febe54c7a0c.herokuapp.com/graphql",
     credentials: 'include', 
     headers: {
       Authorization: token ? `Bearer ${token}` : console.error("errort"), 
