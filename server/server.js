@@ -11,7 +11,7 @@ const { authMiddleware } = require("../server/utils/auth");
 const PORT = process.env.PORT || 3001;
 const app = express();
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://book-engine-mern-21-5febe54c7a0c.herokuapp.com/'],
   credentials: true
 }));
 
