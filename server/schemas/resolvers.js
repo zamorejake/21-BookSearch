@@ -43,18 +43,29 @@ const resolvers = {
     },
   
   saveBook: async (_, { input }, context) => {
-    console.log("46",input)
-    console.log("47", context)
+   
+
     if (context.user._id) {
+      const newBook = {
+        bookId: input.bookId,
+        title: input.title,
+        authors: input.authors,
+        description: input.description,
+        image: input.image || "",
+        link: input.link || "",
+      };
+    
       const updatedUser = await User.findByIdAndUpdate(
         context.user._id,
-        { $addToSet: { savedBooks: input } },
+        { $addToSet: { savedBooks: newBook } },
         { new: true }
       ).populate("savedBooks");
-      console.log("b4",updatedUser)
+  
+   
       return updatedUser;
     }
-    console.log("after",updatedUser)
+  
+  
     throw new AuthenticationError("Not logged in!!!");
   },
 },
@@ -72,7 +83,6 @@ const resolvers = {
   },
   User: {
     savedBooks: async (parent) => {
-      console.log(parent)
       if (parent.savedBooks && parent.savedBooks.length > 0) {
         const userWithSavedBooks = await User.findById(parent._id).populate('savedBooks');
         return userWithSavedBooks.savedBooks;

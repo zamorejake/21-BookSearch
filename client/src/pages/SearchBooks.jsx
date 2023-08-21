@@ -57,7 +57,6 @@ const SearchBooks = () => {
     }
   
     try {
-      console.log("Before saveBook mutation");
       const { data } = await saveBook({
         variables: {
           input: {
@@ -68,9 +67,7 @@ const SearchBooks = () => {
           },
         },
       });
-      console.log("After saveBook mutation");
-  
-      console.log("Mutation Response:", data);
+     
   
       if (!data.saveBook) {
         throw new Error("Something went wrong!");
@@ -78,7 +75,7 @@ const SearchBooks = () => {
   
       setSavedBookIds([...savedBookIds, bookId]);
     } catch (err) {
-      console.error("bingo");
+      console.error("Error: ",err);
     }
   };
   
@@ -142,7 +139,7 @@ const SearchBooks = () => {
                           book.title,
                           book.authors,
                           book.description)
-                          & console.log(book.bookId)
+                          
                         }
                       >
                         {savedBookIds?.some(

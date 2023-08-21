@@ -10,7 +10,6 @@ module.exports = {
     let token = req.query.token || req.headers.authorization;
     if (req.headers.authorization) {
       token = token.split(' ').pop().trim();
-      console.log("line 14" + token)
     }
 
     if (!token) {

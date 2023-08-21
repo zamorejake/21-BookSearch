@@ -11,16 +11,18 @@ const SavedBooks = () => {
 
   const { loading, data } = useQuery(GET_ME);
 
-  const [removeBook] = useMutation(REMOVE_BOOK);
+  const [removeBook] = useMutation(REMOVE_BOOK, {
+    refetchQueries: [ GET_ME ],
+  });
 
   useEffect(() => {
-    if (data) {
-      setUserData(data.me);
-    }
-  }, [data]);
+  if (data && data.users) {
+    setUserData(data.users);
+  }
+}, [data]);
 
   useEffect(() => {
-  }, [userData.savedBooks]);
+  }, [userData?.savedBooks]);
 
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
@@ -34,13 +36,16 @@ const SavedBooks = () => {
         variables: { bookId },
       });
 
-      setUserData((prevUserData) => ({
-        ...prevUserData,
-        savedBooks: prevUserData.savedBooks.filter(
+      setUserData((prevUserData) => {
+        const updatedSavedBooks = prevUserData.savedBooks.filter(
           (book) => book.bookId !== bookId
-        ),
-      }));
-
+        );
+      
+        return {
+          ...prevUserData,
+          savedBooks: updatedSavedBooks,
+        };
+      });
       removeBookId(bookId);
     } catch (err) {
       console.error(err);
@@ -67,7 +72,7 @@ const SavedBooks = () => {
             : "You have no saved books!"}
         </h2>
         <Row>
-          {console.log(userData.savedBooks)}
+          {}
           {userData?.savedBooks?.map((book) => (
             <Col md="4" key={book.bookId}>
               <Card border="dark">
