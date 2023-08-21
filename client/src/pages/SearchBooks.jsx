@@ -49,18 +49,28 @@ const SearchBooks = () => {
     }
   };
 
-  const handleSaveBook = async (bookId) => {
-
+  const handleSaveBook = async (bookId, title, authors, description) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
-
+  
     if (!token) {
       return false;
     }
-
+  
     try {
+      console.log("Before saveBook mutation");
       const { data } = await saveBook({
-        variables: { input: { bookId } },
+        variables: {
+          input: {
+            bookId,
+            title,
+            authors,
+            description,
+          },
+        },
       });
+      console.log("After saveBook mutation");
+  
+      console.log("Mutation Response:", data);
   
       if (!data.saveBook) {
         throw new Error("Something went wrong!");
@@ -68,9 +78,10 @@ const SearchBooks = () => {
   
       setSavedBookIds([...savedBookIds, bookId]);
     } catch (err) {
-      console.error(err);
+      console.error("bingo");
     }
   };
+  
 
   return (
     <>
@@ -127,7 +138,12 @@ const SearchBooks = () => {
                           (savedBookId) => savedBookId === book.bookId
                         )}
                         className="btn-block btn-info"
-                        onClick={() => handleSaveBook(book.bookId)}
+                        onClick={() => handleSaveBook( book.bookId,
+                          book.title,
+                          book.authors,
+                          book.description)
+                          & console.log(book.bookId)
+                        }
                       >
                         {savedBookIds?.some(
                           (savedBookId) => savedBookId === book.bookId

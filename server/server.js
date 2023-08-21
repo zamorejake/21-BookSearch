@@ -11,13 +11,14 @@ const { authMiddleware } = require("../server/utils/auth");
 const PORT = process.env.PORT || 3001;
 const app = express();
 app.use(cors({
-  origin: "http://127.0.0.1:3000",
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true
 }));
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  introspection: true, 
 });
 
 app.use(express.urlencoded({ extended: true }));
